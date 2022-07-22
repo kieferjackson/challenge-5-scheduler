@@ -27,7 +27,7 @@ class TimeBlock {
         tblock = $('<div></div>').addClass('time-block row');
 
         // Declare hour element to display its time
-        hour = $('<div></div>').addClass('hour');
+        hour = $('<div></div>').addClass('hour col-1');
         hour.text(this.#standard_time());
 
         // Check and set the description depending on if this time block is in the past, present, or future
@@ -62,7 +62,7 @@ class TimeBlock {
 
     // Generates the .description based on the current time and timeblock type
     #g_desc(tblock_type) {
-        let desc_el = $('<textarea></textarea>').addClass(`description ${tblock_type}`);
+        let desc_el = $('<textarea></textarea>').addClass(`description ${tblock_type} col-10`);
         return desc_el;
     }
 
@@ -90,6 +90,18 @@ let timeblocks = [];
 for (var i = 0 ; i <= (end_of_day - start_of_day) ; i++) {
     timeblocks[i] = new TimeBlock(start_of_day + i);
     timeblocks[i].display(i);
+
+    // Get the value for this timeblock saved locally, this value is null if no event is saved
+    let local_tb = localStorage.getItem(`#tb${i}`);
+
+    // Check if there is an event saved already for this timeblock, and display if so
+    if (local_tb != null) {
+        // Select the timeblock's event textarea element
+        let tb_textarea = document.querySelector(`#tb${i}`);
+
+        // Update the textarea with the locally saved timeblock event
+        tb_textarea.value = local_tb;
+    }
 }
 
 // Select all save buttons in the document
@@ -103,7 +115,6 @@ function saveTBtoLocal(event) {
 
     // Get the index for the timeblock from the button's data attribute
     let tb_id = event.target.dataset.tb_index;
-    console.log(tb_id);
 
     // Select the timeblock's text area based on its unique id
     const tb_textarea = document.querySelector(`#tb${tb_id}`);
@@ -120,7 +131,7 @@ function saveTBtoLocal(event) {
         // No input exists for this textarea, delete the previously saved item if it exists
         if (localStorage.getItem(`#tb${tb_id}`) != null) {
             localStorage.removeItem(`#tb${tb_id}`);
-        };
+        }
     }
 }
 
