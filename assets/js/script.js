@@ -44,6 +44,8 @@ class TimeBlock {
             desc = this.#g_desc('future');
         }
 
+        desc.attr("id", `tb${index_of_timeblock}`);
+
         // Generate the save button element and sets the index for its timeblock
         save_button = $('<button></button>').addClass('saveBtn');
         save_button.attr('data-tb_index', index_of_timeblock);
@@ -103,15 +105,22 @@ function saveTBtoLocal(event) {
     let tb_id = event.target.dataset.tb_index;
     console.log(tb_id);
 
-    let event_to_save = timeblocks[tb_id].event;
+    // Select the timeblock's text area based on its unique id
+    const tb_textarea = document.querySelector(`#tb${tb_id}`);
+
+    // Update the timeblock array's TimeBlock object with the event
+    timeblocks[tb_id].event = tb_textarea.value;
     
-    if (event_to_save !== "") {
-        // An event has been entered, so there is something to save
-        // TODO: Add the ability to save locally
-    }
+    // Check that there is a value entered, and save it locally if so
+    if (tb_textarea.value != "") {
+        // Input exists for this textarea, save to local storage
+        localStorage.setItem(`#tb${tb_id}`, tb_textarea.value);
+    } 
     else {
-        // No event has been entered, so there is nothing to save
-        // TODO: Add a modal popup to tell the user that there is nothing to save
+        // No input exists for this textarea, delete the previously saved item if it exists
+        if (localStorage.getItem(`#tb${tb_id}`) != null) {
+            localStorage.removeItem(`#tb${tb_id}`);
+        };
     }
 }
 
@@ -170,7 +179,7 @@ function determineDate() {
     // ordinals are numbers with additional letters (i.e. 'st, 'nd', 'rd', or 'th') depending on the number
     let ordinal = day % 10;
 
-    // There is an exception for ordinal numbers between 10 and 20 which 'includes_ordinal' accounts for
+    // There is an exception for ordinal numbers between 10 and 20 which 'is_special_ordinal' accounts for
     // 11, 12, and 13 end with 'th' instead of 'st', 'nd', and 'rd' respectively
     let is_special_ordinal = day < 10 || day > 20;
 
