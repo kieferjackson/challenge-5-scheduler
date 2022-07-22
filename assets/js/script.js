@@ -18,8 +18,6 @@ class TimeBlock {
         this.hour = hour;
     }
 
-    event = "";
-
     display(index_of_timeblock) {
         let tblock, hour, desc, save_button;
 
@@ -118,9 +116,6 @@ function saveTBtoLocal(event) {
 
     // Select the timeblock's text area based on its unique id
     const tb_textarea = document.querySelector(`#tb${tb_id}`);
-
-    // Update the timeblock array's TimeBlock object with the event
-    timeblocks[tb_id].event = tb_textarea.value;
     
     // Check that there is a value entered, and save it locally if so
     if (tb_textarea.value != "") {
