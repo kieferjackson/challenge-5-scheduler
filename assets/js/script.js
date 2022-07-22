@@ -20,7 +20,7 @@ class TimeBlock {
 
     event = "";
 
-    display() {
+    display(index_of_timeblock) {
         let tblock, hour, desc, save_button;
 
         // Declare the timeblock element
@@ -44,12 +44,9 @@ class TimeBlock {
             desc = this.#g_desc('future');
         }
 
-        // Set the data attribute for this elements time
-        desc.attr('data-hour', this.hour);
-
-        // Generate the save button element
+        // Generate the save button element and sets the index for its timeblock
         save_button = $('<button></button>').addClass('saveBtn');
-        save_button.attr('onclick', 'saveTBtoLocal()');
+        save_button.attr('data-tb_index', index_of_timeblock);
         save_button.text("Save");
 
         // Append all hour, description, and save button to timeblock element
@@ -90,7 +87,32 @@ let timeblocks = [];
 // Generate Time Blocks depending on the number of hours between start and end of day
 for (var i = 0 ; i <= (end_of_day - start_of_day) ; i++) {
     timeblocks[i] = new TimeBlock(start_of_day + i);
-    timeblocks[i].display();
+    timeblocks[i].display(i);
+}
+
+// Select all save buttons in the document
+let save_buttons = $('.saveBtn');
+
+// A save button has been clicked for an element, so save the contents of the text area to local storage
+save_buttons.on('click', saveTBtoLocal);
+
+function saveTBtoLocal(event) {
+    event.preventDefault();
+
+    // Get the index for the timeblock from the button's data attribute
+    let tb_id = event.target.dataset.tb_index;
+    console.log(tb_id);
+
+    let event_to_save = timeblocks[tb_id].event;
+    
+    if (event_to_save !== "") {
+        // An event has been entered, so there is something to save
+        // TODO: Add the ability to save locally
+    }
+    else {
+        // No event has been entered, so there is nothing to save
+        // TODO: Add a modal popup to tell the user that there is nothing to save
+    }
 }
 
 function determineDate() {
@@ -148,16 +170,20 @@ function determineDate() {
     // ordinals are numbers with additional letters (i.e. 'st, 'nd', 'rd', or 'th') depending on the number
     let ordinal = day % 10;
 
+    // There is an exception for ordinal numbers between 10 and 20 which 'includes_ordinal' accounts for
+    // 11, 12, and 13 end with 'th' instead of 'st', 'nd', and 'rd' respectively
+    let is_special_ordinal = day < 10 || day > 20;
+
     // Set the day of the week
-    if (ordinal === 1) {
+    if (ordinal === 1 && is_special_ordinal) {
         // This day is the ()st of the month
         day += 'st';
     }
-    else if (ordinal === 2) {
+    else if (ordinal === 2 && is_special_ordinal) {
         // This day is the ()nd of the month
         day += 'nd';
     }
-    else if (ordinal === 3) {
+    else if (ordinal === 3 && is_special_ordinal) {
         // This day is the ()rd of the month
         day += 'rd';
     }
